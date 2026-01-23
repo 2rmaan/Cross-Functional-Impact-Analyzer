@@ -1,7 +1,7 @@
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+import textwrap
 
 def build_requirements_graph():
     """
@@ -10,7 +10,6 @@ def build_requirements_graph():
     G = nx.DiGraph()
 
     # 1. Define Parent-Child (Derivation) Relationships
-    # Structure: Parent: [Children]
     derivations = {
         'Req 1': ['Req 1.1', 'Req 1.2', 'Req 1.3', 'Req 1.4'],
         'Req 2': ['Req 2.1', 'Req 2.2'],
@@ -20,13 +19,13 @@ def build_requirements_graph():
         'Req 6': ['Req 6.1', 'Req 6.2', 'Req 6.3', 'Req 6.4']
     }
 
-    # Add derivation edges (Parent -> Child)
+    # Add derivation edges
     for parent, children in derivations.items():
         for child in children:
             G.add_edge(parent, child, type='derived')
 
-    # 2. Define High-Level Dependencies (Parent to Parent)
-    # Structure: Provider -> Dependent (If Provider changes, Dependent is impacted)
+    # 2. Define High-Level Dependencies
+    # Provider -> Dependent
     dependencies = [
         ('Req 1', 'Req 3'), # 3 depends on 1
         ('Req 3', 'Req 4'), # 4 depends on 3
@@ -40,93 +39,114 @@ def build_requirements_graph():
 
     return G
 
-def plot_traceability_matrix(G):
+def plot_organized_table(G):
     """
-    Visual 1: A traditional Traceability Matrix (Heatmap style).
+    Visual 1: A Hierarchical Table (Only Parents get rows).
     """
-    nodes = sorted(list(G.nodes()))
-    matrix_data = []
+    # We only want to create rows for the Top Level requirements
+    parents = ['Req 1', 'Req 2', 'Req 3', 'Req 4', 'Req 5', 'Req 6']
+    
+    table_data = []
 
-    for source in nodes:
-        row = []
-        for target in nodes:
-            if source == target:
-                row.append(1) # Self
-            elif G.has_edge(source, target):
-                row.append(1) # Direct connection
-            elif nx.has_path(G, source, target):
-                row.append(0.5) # Indirect connection
+    for p in parents:
+        # 1. Get Sub-Requirements
+        # We sort them so they appear in order (1.1, 1.2...)
+        children = sorted([n for n in G.successors(p) if G[p][n]['type'] == 'derived'])
+        # We wrap the text so it doesn't make the table too wide
+        children_str = "\n".join(textwrap.wrap(", ".join(children), width=30)) if children else "-"
+
+        # 2. Get Dependencies (Who does P need?)
+        upstream = [n for n in G.predecessors(p) if G[n][p]['type'] == 'dependency']
+        upstream_str = "\n".join(upstream) if upstream else "None"
+
+        # 3. Get Impacts (Who needs P?)
+        downstream = [n for n in G.successors(p) if G[p][n]['type'] == 'dependency']
+        downstream_str = "\n".join(downstream) if downstream else "None"
+
+        table_data.append([p, children_str, upstream_str, downstream_str])
+
+    # Define Column Names
+    columns = ["Parent Req", "Sub-Requirements", "Depends On\n(Input)", "Impacts\n(Output)"]
+    
+    # Create the Plot
+    fig, ax = plt.subplots(figsize=(12, 8)) 
+    ax.axis('tight')
+    ax.axis('off')
+    
+    # Draw Table
+    # colWidths controls how wide the columns are. 
+    # We give more space (0.4) to the Sub-Requirements column.
+    table = ax.table(cellText=table_data, colLabels=columns, cellLoc='left', loc='center', 
+                     colWidths=[0.15, 0.45, 0.2, 0.2])
+    
+    # Styling
+    table.auto_set_font_size(False)
+    table.set_fontsize(11)
+    table.scale(1, 4) # This stretches the row height so lines don't overlap
+    
+    # Color Styling
+    for (row, col), cell in table.get_celld().items():
+        if row == 0:
+            cell.set_text_props(weight='bold', color='white')
+            cell.set_facecolor('#003366') # Professional Dark Blue
+            cell.set_height(0.1)
+        else:
+            # Alternating row colors for readability
+            if row % 2 == 0:
+                cell.set_facecolor('#f2f2f2')
             else:
-                row.append(0) # No connection
-        matrix_data.append(row)
+                cell.set_facecolor('white')
+            
+            # Add some padding logic by adjusting height
+            cell.set_text_props(verticalalignment='center')
 
-    df = pd.DataFrame(matrix_data, index=nodes, columns=nodes)
-
-    plt.figure(figsize=(12, 10))
-    sns.heatmap(df, cmap="Blues", cbar=False, linewidths=.5, linecolor='gray')
-    plt.title("Requirement Traceability Matrix\n(Dark = Direct, Light = Indirect)", fontsize=16)
-    plt.tight_layout()
+    plt.title("Requirement Traceability Matrix (RTM)", fontsize=16, weight='bold', y=0.98)
     plt.show()
 
 def perform_impact_analysis(G, changed_reqs):
     """
-    Visual 2: Network Graph highlighting the 'Blast Radius' of the change.
+    Visual 2: The Network Graph (Unchanged)
     """
-    # 1. Identify all impacted nodes (downstream)
     impacted_nodes = set()
     for req in changed_reqs:
         impacted_nodes.add(req)
-        # Get all descendants (everything that flows FROM this node)
         descendants = nx.descendants(G, req)
         impacted_nodes.update(descendants)
 
-    # 2. Set Colors
     color_map = []
     for node in G.nodes():
         if node in changed_reqs:
-            color_map.append('red') # The Root Cause
+            color_map.append('#ff4d4d') 
         elif node in impacted_nodes:
-            color_map.append('orange') # The Impacted Area
+            color_map.append('#ffcc00') 
         else:
-            color_map.append('lightgrey') # Safe
+            color_map.append('#e6e6e6') 
 
-    # 3. Visualize
     plt.figure(figsize=(14, 10))
-    pos = nx.spring_layout(G, seed=42, k=0.8) # k regulates distance between nodes
+    pos = nx.spring_layout(G, seed=42, k=0.9) 
     
-    # Draw graph
     nx.draw(G, pos, node_color=color_map, with_labels=True, 
             node_size=2500, font_size=9, font_weight='bold', 
             edge_color='gray', arrows=True)
     
-    # Legend
     legend_elements = [
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=15, label='Changed Requirement'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=15, label='Impacted (Risk)'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='lightgrey', markersize=15, label='No Impact')
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#ff4d4d', markersize=15, label='Changed Req'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#ffcc00', markersize=15, label='Impacted Risk'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#e6e6e6', markersize=15, label='Safe')
     ]
     plt.legend(handles=legend_elements, loc='upper left')
     
     plt.title(f"Impact Analysis Simulation: Changing {', '.join(changed_reqs)}", fontsize=16)
     plt.show()
-    
-    return impacted_nodes
 
 # --- EXECUTION ---
 if __name__ == "__main__":
-    # 1. Build the Data Structure
     req_graph = build_requirements_graph()
     
-    # 2. Show the Static Matrix (The Documentation View)
-    print("Generating Traceability Matrix...")
-    plot_traceability_matrix(req_graph)
+    print("Generating Traceability Table...")
+    plot_organized_table(req_graph)
 
-    # 3. Simulate the Change (The Analysis View)
-    # User scenario: Change in Req 3 and Req 1
     change_scenario = ['Req 1', 'Req 3']
     print(f"Simulating change in: {change_scenario}")
     
-    affected = perform_impact_analysis(req_graph, change_scenario)
-    
-    print(f"\nTotal Requirements Affected: {len(affected)}")
-    print(f"List of impacted requirements: {sorted(list(affected))}")
+    perform_impact_analysis(req_graph, change_scenario)
