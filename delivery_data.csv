@@ -1,0 +1,14 @@
+ID,Type,Name,Parent,DependsOn,Effort_SP,Cost_USD,Value_Score,Team_Owner,Risk_Level
+Req 1,Business,Core Platform,None,None,0,0,High,Architecture,Low
+Req 1.1,Functional,User Auth,Req 1,None,8,1200,High,Backend,Medium
+Req 1.2,Functional,Profile Mgmt,Req 1,None,5,750,Medium,Backend,Low
+Req 1.3,Functional,Password Reset,Req 1,None,3,450,Low,Backend,Low
+Req 1.4,Functional,MFA Support,Req 1,None,13,2000,High,Security,High
+Req 2,Business,Payment Gateway,None,None,0,0,High,Finance,Medium
+Req 2.1,Functional,Stripe Integration,Req 2,None,21,3500,High,Payments,High
+Req 2.2,Functional,Refund Logic,Req 2,None,8,1200,Medium,Payments,Medium
+Req 3,Business,Reporting Suite,None,Req 1,0,0,Medium,Data Science,Low
+Req 3.1,Functional,PDF Export,Req 3,None,5,800,Low,Frontend,Low
+Req 4,Business,Notification Engine,None,Req 3,0,0,Low,DevOps,Medium
+Req 5,Business,Admin Console,None,Req 2,0,0,Medium,Frontend,Low
+Req 6,Business,Mobile App,None,Req 1,0,0,High,Mobile,High
