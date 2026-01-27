@@ -27,8 +27,6 @@ This framework consumes raw feature registries and dependency maps to produce tw
 #### **1. Operational Impact Map**
 This visualization identifies the "Blast Radius" of a change request. It allows leadership to see which teams are impacted by a scope change, even if they aren't the primary owners of the feature being updated.
 
-**View Chart:** [impact_map.png](./impact_map.png)
-
 * **Change Triggers (Red):** Features directly targeted by stakeholder requests (F1, F5).
 * **Indirect Impacts (Orange):** Features forced into a delay due to architectural or delivery dependencies (F8, F10).
 * **Cross-Functional Awareness:** Labels identify team ownership, highlighting where inter-team "handshakes" are required.
@@ -37,10 +35,6 @@ This visualization identifies the "Blast Radius" of a change request. It allows 
 
 #### **2. Schedule Shift Analysis**
 A side-by-side comparison of the project’s **Baseline** vs. **Revised** timeline. This chart quantifies the cost of change in units of time.
-
-**View Chart:** [schedule_comparison.png](./schedule_comparison.png)
-
-
 
 * **Critical Path Identification:** Automatically calculates new end-dates based on topological sorting of dependencies.
 * **Automated Delay Callouts:** Explicitly labels the number of days each feature has slipped (e.g., "+10d delay"), providing objective data for stakeholder negotiation.
