@@ -9,7 +9,6 @@ class FeatureAnalyzer:
         self.deps_df = pd.read_csv(deps_path)
         self.G = self._build_graph()
         
-        # Detect change targets automatically from the data
         self.change_requests = self.features_df[
             self.features_df['Revised_Effort'] != self.features_df['Baseline_Effort']
         ]['Feature_ID'].tolist()
@@ -55,7 +54,6 @@ class FeatureAnalyzer:
         labels = {n: f"{n}\n{self.G.nodes[n]['Team']}" for n in self.G.nodes()}
         nx.draw_networkx_labels(self.G, pos, labels=labels, font_size=9, font_weight='bold', ax=ax)
         
-        # FIXED: Title without using problematic tight_layout
         ax.set_title("STRATEGIC IMPACT MAP: CROSS-FUNCTIONAL RISK", fontsize=16, fontweight='bold', pad=20)
         
         plt.axis('off')
@@ -86,12 +84,10 @@ class FeatureAnalyzer:
         ax.set_yticklabels([f"{f} ({self.G.nodes[f]['Team']})" for f in features])
         ax.invert_yaxis()
         
-        # FIXED: Title and Layout
         ax.set_title("SCHEDULE SHIFT ANALYSIS: BASELINE VS REVISED", fontsize=16, fontweight='bold', pad=20)
         ax.set_xlabel("Working Days")
         ax.legend(loc='lower right')
         
-        # Extra space for labels on the right
         ax.set_xlim(right=max(r_end.values()) * 1.1)
         
         plt.savefig('schedule_comparison.png', bbox_inches='tight')
