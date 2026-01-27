@@ -1,66 +1,57 @@
-# ReqImpact-Analyzer: Automated Traceability & Impact Analysis
+# Strategic Delivery Governance Framework: Cross-Functional Impact Analyzer
 
-### **Overview**
-**ReqImpact-Analyzer** is a Python-based tool designed to automate the visualization of `Requirement Traceability Matrices (RTM)` and simulate the `Blast Radius` of potential changes in a project. 
-
-As a Business Analyst, managing requirements is not just about documenting them, it is about understanding their relationships. When a stakeholder asks to change "just one small thing," it rarely impacts only that one thing. This tool uses `Directed Acyclic Graphs (DAGs)` to mathematically map dependencies and visualize the systemic risk of scope changes.
+### **Project Overview**
+"Small" stakeholder change requests often trigger a wave of delays across the portfolio. This project provides a data-driven governance engine to quantify the ripple effect of scope changes. By mapping interdependencies and recalculating delivery timelines in real-time, it bridges the gap between executive decision-making and operational reality.
 
 ---
 
-### **The Business Problem**
-In complex projects, requirements are interconnected.
-1.  **Derivation:** High-level business needs break down into smaller functional requirements (Parent $\to$ Child).
-2.  **Dependency:** Feature A cannot function without Feature B (Provider $\to$ Consumer).
-
-Managing these links in Excel is manual, static, and error-prone. If a root requirement changes, it is difficult to instantly identify every downstream functional requirement that is now at risk.
-
-### **The Solution**
-This tool ingests a set of raw requirements and relationships to generate two key artifacts:
-
-#### **1. The Hierarchical Traceability Matrix (RTM)**
-A clean, table-based view that organizes requirements by their Parent ID. It instantly answers:
-* *What specific functional items make up this requirement?* (Children)
-* *What inputs does this requirement need?* (Upstream Dependencies)
-* *Who will break if this requirement fails?* (Downstream Impacts)
-
-![Traceability Table](traceability_table.png)
-
-#### **2. The Impact Analysis Simulator**
-A visual network graph that simulates a "Change Request."
-* **Scenario:** We simulate a change to **Req 1** and **Req 3**.
-* **Logic:** The algorithm traverses the graph to find every node connected downstream from these changes.
-* **Visuals:**
-    * 🔴 **Red Nodes:** The requirements being changed.
-    * 🟠 **Orange Nodes:** The "Blast Radius" (requirements at risk).
-    * ⚪ **Grey Nodes:** Unaffected requirements.
-
-![Impact Analysis Graph](impact_analysis.png)
+### **The Value Proposition**
+A data-driven governance engine designed to quantify the ripple effect of scope changes across multi-team dependencies and visualize resulting delivery delays.
 
 ---
 
-### **Case Study: The Logic Behind the Data**
-For this simulation, we used a specific set of 6 parent requirements with the following rules:
+### **The Challenge: The "Invisible" Delivery Risk**
+Standard project tracking often fails to account for how a delay in one team’s "Root Feature" impacts another team’s "Downstream Delivery." When Team Alpha increases effort by 10 days, Team Gamma—who hasn't changed their scope at all—may find their finish line pushed back by two weeks due to a hidden dependency. 
 
-* **The Hierarchy:**
-    * Req 1 $\to$ breaks down into 1.1, 1.2, 1.3, 1.4
-    * Req 3 $\to$ breaks down into 3.1 through 3.8
-* **The Dependencies:**
-    * **Req 3 depends on Req 1** (If Req 1 changes, Req 3 is at risk).
-    * **Req 4 depends on Req 3** (The chain reaction continues).
 
-#### **Analysis of the Results**
-When we run the simulation for a change in **Req 1** and **Req 3**:
-1.  **Direct Impact:** All sub-requirements (1.1–1.4 and 3.1–3.8) turn **Orange**. This is expected; if the parent changes, the children must be reviewed.
-2.  **Second-Order Impact:** **Req 4** turns **Orange**. Even though we didn't touch Req 4, it relies on Req 3. Since Req 3 changed, Req 4 is now unstable.
-3.  **Third-Order Impact:** **Req 6** turns **Orange**. It has a dependency on Req 1.
 
-**Conclusion of Simulation:** A request to change 2 items actually impacts **over 15 items** across the system.
+### **The Solution: Analytical Oversight**
+This framework consumes raw feature registries and dependency maps to produce two critical perspectives:
+1. **Organizational Alignment:** Identifying which teams (Alpha, Beta, Gamma) must collaborate to accommodate a change.
+2. **Temporal Impact:** Quantifying exactly how many days the project end-date will shift across the entire feature set.
 
 ---
 
-## 🛠️ Tech Stack
-This project was built using **Python 3.x** and leverages the following libraries to handle graph theory and data visualization:
+### **Analytical Outputs**
 
-* `NetworkX:` Used to construct the `Directed Acyclic Graph (DAG)` and perform the "descendant traversal" algorithm to calculate the impact blast radius.
-* `Matplotlib:` Used to render both the structured Traceability Table and the Force-Directed Network Graph.
-* `Pandas:` Used to organize the requirement data into structured DataFrames for easy manipulation and tabular display.
+#### **1. Operational Impact Map**
+This visualization identifies the "Blast Radius" of a change request. It allows leadership to see which teams are impacted by a scope change, even if they aren't the primary owners of the feature being updated.
+
+**View Chart:** [impact_map.png](./impact_map.png)
+
+* **Change Triggers (Red):** Features directly targeted by stakeholder requests (F1, F5).
+* **Indirect Impacts (Orange):** Features forced into a delay due to architectural or delivery dependencies (F8, F10).
+* **Cross-Functional Awareness:** Labels identify team ownership, highlighting where inter-team "handshakes" are required.
+
+![Operational Impact Map](./impact_map.png)
+
+#### **2. Schedule Shift Analysis**
+A side-by-side comparison of the project’s **Baseline** vs. **Revised** timeline. This chart quantifies the cost of change in units of time.
+
+**View Chart:** [schedule_comparison.png](./schedule_comparison.png)
+
+
+
+* **Critical Path Identification:** Automatically calculates new end-dates based on topological sorting of dependencies.
+* **Automated Delay Callouts:** Explicitly labels the number of days each feature has slipped (e.g., "+10d delay"), providing objective data for stakeholder negotiation.
+
+![Schedule Shift Analysis](./schedule_comparison.png)
+
+---
+
+### **Strategic Action Plan**
+Upon identifying a schedule shift, the framework enables the following governance steps:
+1. **Stakeholder Negotiation:** Use the Schedule Shift Analysis to present a data-backed case for either extending the deadline or increasing resources.
+2. **Cross-Functional Sync:** Initiate a "Handshake Meeting" between the Change Trigger Team and the Indirectly Impacted Team to align on new delivery windows.
+3. **Critical Path Protection:** Prioritize resources for features that have the highest accumulated delay (F10) to prevent further portfolio delay.
+4. **Scope Re-prioritization:** Identify "Stable" features (F2, F7) with low business value that can be de-scoped to reclaim the lost days and protect the original Go-Live date.
