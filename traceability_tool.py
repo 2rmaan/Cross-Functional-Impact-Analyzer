@@ -72,7 +72,7 @@ class FeatureAnalyzer:
         
         ax.barh(y_pos - 0.2, [r_end[f] - r_start[f] for f in features], 
                 left=[r_start[f] for f in features], height=0.4, 
-                label='Revised', color='#e67e22')
+                label='Revised', color='#87ceeb')
         
         for i, f in enumerate(features):
             slip = r_end[f] - b_end[f]
