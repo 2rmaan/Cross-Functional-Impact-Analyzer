@@ -72,13 +72,13 @@ class FeatureAnalyzer:
         
         ax.barh(y_pos - 0.2, [r_end[f] - r_start[f] for f in features], 
                 left=[r_start[f] for f in features], height=0.4, 
-                label='Revised', color='#87ceeb')
+                label='Revised', color='#1e90ff')
         
         for i, f in enumerate(features):
             slip = r_end[f] - b_end[f]
             if slip > 0:
                 ax.text(r_end[f] + 1, i, f"DELAY: +{int(slip)}d", 
-                        va='center', color='#d35400', fontweight='bold')
+                        va='center', color='#1e90ff', fontweight='bold')
 
         ax.set_yticks(y_pos)
         ax.set_yticklabels([f"{f} ({self.G.nodes[f]['Team']})" for f in features])
