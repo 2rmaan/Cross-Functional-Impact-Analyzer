@@ -39,7 +39,7 @@ A side-by-side comparison of the project’s **Baseline** vs. **Revised** timeli
 * **Critical Path Identification:** Automatically calculates new end-dates based on topological sorting of dependencies.
 * **Automated Delay Callouts:** Explicitly labels the number of days each feature has slipped (e.g., "+10d delay"), providing objective data for stakeholder negotiation.
 
-![Schedule Shift Analysis](./schedule_comparison.png)
+![Schedule Shift Analysis](schedule_comparison.png)
 
 ---
 
